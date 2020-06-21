@@ -3,12 +3,13 @@ import mongoose from "mongoose";
 export const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
+      useCreateIndex: true,
       useNewUrlParser: true,
       useFindAndModify: true,
       useUnifiedTopology: true,
     });
-    console.log(`Mongodb connected successfully!!!`);
+    console.log(`Mongodb connected successfully!!!`.cyan);
   } catch (error) {
-    console.log(`Something went wrong on the database`);
+    console.log(`Something went wrong on the database`.red);
   }
 };

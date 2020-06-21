@@ -1,9 +1,22 @@
-export const getAllBootcamps = async (req, res, next) => {
+import BootCampSchema from "../models/Bootcamps";
+
+export const createBootcamp = async (req, res, next) => {
   try {
-    new Throw("wrong");
-    res.send({ success: true, data: "working!!!" });
+    let bootcamp = new BootCampSchema(req.body);
+    await bootcamp.save();
+    res.send({ success: true, data: bootcamp });
   } catch (error) {
     const err = { success: false, status: 404, error: error.message };
-    next(err);
+    next(error);
+  }
+};
+
+export const getAllBootcamps = async (req, res, next) => {
+  try {
+    let bootcamps = BootCampSchema.find();
+    res.send({ success: true, data: bootcamps });
+  } catch (error) {
+    const err = { success: false, status: 404, error: error.message };
+    next(error);
   }
 };
