@@ -1,23 +1,38 @@
 // import express from "express";
 import { CreateHttpError } from "http-errors";
+import { CustomError } from "../utils/customError";
 
 export const errorHandler = (err, req, res, next) => {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+  let error = { ...err };
 
-  let error = {};
-  let status;
+  error.message = err.message;
 
-  if (err.code === 11000) {
-    status = 404;
-    error.error = "There is a unique value";
-    error.success = false;
+  // Log to console for dev
+  console.log(err);
+
+  // Mongoose bad ObjectId
+  if (err.name === "CastError") {
+    const message = `Resource not found`;
+    error = new CustomError(message, 404);
   }
 
-  // render the error page
-  res.status(status);
-  res.send(error);
+  // Mongoose duplicate key
+  if (err.code === 11000) {
+    const message = "Duplicate field value entered";
+    error = new CustomError(message, 400);
+  }
+
+  // Mongoose validation error
+  if (err.name === "ValidationError") {
+    const message = Object.values(err.errors).map((val) => val.message);
+    error = new CustomError(message, 400);
+  }
+
+  res.status(error.statusCode || 500).json({
+    success: false,
+    error: error.message || "Server Error",
+  });
 };
 
 export const createError = (req, res, next) => {

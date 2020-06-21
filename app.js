@@ -7,7 +7,7 @@ import colors from "colors";
 
 dotenv.config();
 
-import usersRouter from "./routes/users";
+import usersRouter from "./routes/bootcamp";
 import { errorHandler, createError } from "./config/errorHandler";
 
 const app = express();
@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use("/users", usersRouter);
+app.use("/api/v1/bootcamps", usersRouter);
 
 // catch 404 and forward to error handler
 app.use(createError);

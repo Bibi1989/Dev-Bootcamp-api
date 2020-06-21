@@ -29,32 +29,32 @@ const BootCampSchema = new mongoose.Schema({
   //     zipcode: String,
   //     country: String,
   //   },
-  //   website: {
-  //     type: String,
-  //     match: [
-  //       /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
-  //       "Please use a valid www, http or https",
-  //     ],
-  //   },
-  //   email: {
-  //     type: String,
-  //     match: [
-  //       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-  //       "Please use a valid email address",
-  //     ],
-  //   },
-  //   careers: {
-  //     type: [String],
-  //     required: true,
-  //     enum: [
-  //       "Web Development",
-  //       "Mobile Development",
-  //       "UI/UX",
-  //       "Data Science",
-  //       "Business",
-  //       "Others",
-  //     ],
-  //   },
+  website: {
+    type: String,
+    match: [
+      /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
+      "Please use a valid www, http or https",
+    ],
+  },
+  email: {
+    type: String,
+    match: [
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      "Please use a valid email address",
+    ],
+  },
+  careers: {
+    type: [String],
+    required: true,
+    enum: [
+      "Web Development",
+      "Mobile Development",
+      "UI/UX",
+      "Data Science",
+      "Business",
+      "Others",
+    ],
+  },
   averageRating: {
     type: Number,
     min: [1, "Rating must start from atleast 1"],
