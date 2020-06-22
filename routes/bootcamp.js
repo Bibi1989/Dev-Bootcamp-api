@@ -3,6 +3,8 @@ import {
   getAllBootcamps,
   createBootcamp,
   getOneBootcamp,
+  deleteBootcamp,
+  updateBootcamp,
 } from "../controllers/bootcamps";
 const router = Router();
 
@@ -14,7 +16,11 @@ router.route("/").get(getAllBootcamps);
 // @desc      Get all bootcamps
 // @route     GET /api/v1/bootcamps
 // @access    Public
-router.route("/:id").get(getOneBootcamp);
+router
+  .route("/:id")
+  .get(getOneBootcamp)
+  .patch(updateBootcamp)
+  .delete(deleteBootcamp);
 
 // @desc      Post  bootcamp
 // @route     Post /api/v1/bootcamps

@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const BootCampSchema = new mongoose.Schema({
   name: {
     type: String,
     unique: true,
-    required: true,
+    required: [true, "Name is a require field"],
     maxlength: [50, "Name of bootcamp cannot be more than 50 characters"],
   },
   description: {
     type: String,
-    required: true,
+    required: [true, "Description is a require field"],
     minlength: [20, "Description cannot be less than 20 characters"],
   },
   //   location: {
@@ -45,7 +45,7 @@ const BootCampSchema = new mongoose.Schema({
   },
   careers: {
     type: [String],
-    required: true,
+    required: [true, "Career is a require field"],
     enum: [
       "Web Development",
       "Mobile Development",
@@ -80,4 +80,4 @@ const BootCampSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("bootcamp", BootCampSchema);
+module.exports = mongoose.model("bootcamp", BootCampSchema);

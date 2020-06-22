@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
-export const connectDB = async () => {
+module.exports.connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       useCreateIndex: true,
