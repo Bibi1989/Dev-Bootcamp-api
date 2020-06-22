@@ -122,4 +122,5 @@ const howManyPeople = (array) => {
   }, {});
 };
 
-console.log(finalAnswer(people));
+console.log(olderThan30(people));
+console.log(people.length);

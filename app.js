@@ -7,7 +7,9 @@ import colors from "colors";
 
 dotenv.config();
 
-import usersRouter from "./routes/bootcamp";
+import bootcamp from "./routes/bootcamp";
+import course from "./routes/course";
+
 import { errorHandler, createError } from "./config/errorHandler";
 
 const app = express();
@@ -20,7 +22,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use("/api/v1/bootcamps", usersRouter);
+app.use("/api/v1/bootcamps", bootcamp);
+app.use("/api/v1/courses", course);
 
 // catch 404 and forward to error handler
 app.use(createError);

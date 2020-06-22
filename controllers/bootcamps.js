@@ -14,9 +14,43 @@ export const createBootcamp = async (req, res, next) => {
 
 export const getAllBootcamps = async (req, res, next) => {
   try {
-    let bootcamps = await BootCampSchema.find();
+    let bootcamps;
 
-    res.send({ success: true, data: bootcamps });
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 10;
+    let startIndex = (page - 1) * limit;
+    let endIndex = page * limit;
+
+    let count = await BootCampSchema.countDocuments();
+
+    if (req.query.select) {
+      const query = req.query.select.split(",").join(" ");
+      bootcamps = await BootCampSchema.find()
+        .select(query)
+        .skip(startIndex)
+        .limit(limit);
+    } else {
+      bootcamps = await BootCampSchema.find()
+        .populate({
+          path: "courses",
+          select: "title weeks",
+        })
+        .skip(startIndex)
+        .limit(limit);
+    }
+
+    let pagination = {};
+
+    if (endIndex < count) {
+      pagination.next = page + 1;
+    }
+
+    if (startIndex >= limit) {
+      pagination.prev = page - 1;
+    }
+
+    pagination.count = count;
+    res.send({ success: true, pagination, data: bootcamps });
   } catch (error) {
     const err = { success: false, status: 404, error: error.message };
     next(error);
@@ -63,8 +97,7 @@ export const updateBootcamp = async (req, res, next) => {
 
 export const deleteBootcamp = async (req, res, next) => {
   try {
-    const bootcamp = await BootCampSchema.findByIdAndDelete(req.params.id);
-    console.log(bootcamp);
+    const bootcamp = await BootCampSchema.findById(req.params.id);
     if (!bootcamp) {
       return next(
         new CustomError(
@@ -73,6 +106,7 @@ export const deleteBootcamp = async (req, res, next) => {
         )
       );
     }
+    bootcamp.remove();
     res.json({ success: true, data: "Successfully deleted!!!" });
   } catch (error) {
     const err = { success: false, status: 404, error: error.message };
