@@ -11,6 +11,7 @@ dotenv.config();
 
 import bootcamp from "./routes/bootcamp";
 import course from "./routes/course";
+import auth from "./routes/auth";
 
 import { errorHandler, createError } from "./config/errorHandler";
 
@@ -28,6 +29,7 @@ app.use(fileupload());
 
 app.use("/api/v1/bootcamps", bootcamp);
 app.use("/api/v1/courses", course);
+app.use("/auth/v1", auth);
 
 // catch 404 and forward to error handler
 app.use(createError);

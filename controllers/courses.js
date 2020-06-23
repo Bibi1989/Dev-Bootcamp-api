@@ -29,7 +29,7 @@ export const createBootcampCourse = async (req, res, next) => {
 };
 
 export const getAllCourses = async (req, res, next) => {
-  const courses = await paginateApi(Course, req, next);
+  const courses = await paginateApi(Course, req, next, "bootcamp");
 
   res.send(courses);
 };

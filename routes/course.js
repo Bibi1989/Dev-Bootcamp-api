@@ -6,6 +6,7 @@ import {
   updateCourse,
   deleteCourse,
 } from "../controllers/courses";
+import { authenticate, authorize } from "../middlewares/authenticate";
 const router = Router();
 
 // @desc      Get all bootcamps
@@ -19,8 +20,8 @@ router.route("/").get(getAllCourses);
 router
   .route("/:bootcampId")
   .get(getOneCourse)
-  .post(createBootcampCourse)
-  .patch(updateCourse)
-  .delete(deleteCourse);
+  .post(authenticate, authorize("publisher", "admin"), createBootcampCourse)
+  .patch(authenticate, authorize("publisher", "admin"), updateCourse)
+  .delete(authenticate, authorize("publisher", "admin"), deleteCourse);
 
 export default router;

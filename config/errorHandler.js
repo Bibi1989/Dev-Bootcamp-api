@@ -9,7 +9,7 @@ export const errorHandler = (err, req, res, next) => {
   error.message = err.message;
 
   // Log to console for dev
-  console.log(err);
+  console.log(err.message);
 
   // Mongoose bad ObjectId
   if (err.name === "CastError") {
@@ -27,6 +27,15 @@ export const errorHandler = (err, req, res, next) => {
   if (err.name === "ValidationError") {
     const message = Object.values(err.errors).map((val) => val.message);
     error = new CustomError(message, 400);
+  }
+
+  if (err.name === "Error") {
+    const message = err.message.split(":")[2];
+    if (message) {
+      error = new CustomError(message, 400);
+    } else {
+      error = { message: err.message };
+    }
   }
 
   res.status(error.statusCode || 500).json({

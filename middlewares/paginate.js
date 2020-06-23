@@ -15,19 +15,18 @@ export const paginateApi = async (model, req, next, populate) => {
       const query = select.split(",").join(" ");
       result = await model.find().select(query).skip(startIndex).limit(limit);
     } else {
-      if (populate === "populate") {
-        result = await model
-          .find()
-          .populate({
-            path: "courses",
-            select: "title weeks",
-          })
-          .skip(startIndex)
-          .limit(limit);
-      } else {
-        console.log("yes");
-        result = await model.find().skip(startIndex).limit(limit);
-      }
+      //   if (populate === "populate") {
+      result = await model
+        .find()
+        .populate({
+          path: `${populate}`,
+        })
+        .skip(startIndex)
+        .limit(limit);
+      //   } else {
+      // console.log("yes");
+      // result = await model.find().skip(startIndex).limit(limit);
+      //   }
     }
 
     let pagination = {};

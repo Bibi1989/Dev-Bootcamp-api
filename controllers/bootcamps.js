@@ -1,11 +1,19 @@
 const BootCampSchema = require("../models/Bootcamps");
 import { CustomError } from "../utils/customError";
 import path from "path";
-import { populate, find } from "../models/Bootcamps";
 import { paginateApi } from "../middlewares/paginate";
 
 export const createBootcamp = async (req, res, next) => {
   try {
+    req.body.user = req.user.decoded.id;
+    const publisher = await BootCampSchema.findOne({
+      user: req.user.decoded.id,
+    });
+
+    if (publisher && req.user.decoded.role !== "admin") {
+      return next(new CustomError(`You can only publish one bootcamp`, 400));
+    }
+
     let bootcamp = new BootCampSchema(req.body);
     await bootcamp.save();
     res.send({ success: true, data: bootcamp });
@@ -16,7 +24,9 @@ export const createBootcamp = async (req, res, next) => {
 };
 
 export const getAllBootcamps = async (req, res, next) => {
-  const bootcamps = await paginateApi(BootCampSchema, req, next, "populate");
+  const bootcamps = await paginateApi(BootCampSchema, req, next, "courses");
+
+  console.log(req.user);
 
   res.send(bootcamps);
 };
@@ -24,8 +34,6 @@ export const getAllBootcamps = async (req, res, next) => {
 export const getOneBootcamp = async (req, res, next) => {
   try {
     let bootcamps = await BootCampSchema.findById(req.params.id);
-
-    console.log(!bootcamps);
 
     if (!bootcamps) {
       return next(
