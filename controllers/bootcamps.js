@@ -5,11 +5,15 @@ import { paginateApi } from "../middlewares/paginate";
 
 export const createBootcamp = async (req, res, next) => {
   try {
+    //   adding user id to bootcamp
     req.body.user = req.user.decoded.id;
+
+    // searching for a published bootcamp by this particular user
     const publisher = await BootCampSchema.findOne({
       user: req.user.decoded.id,
     });
 
+    // checking to see if publisher as publish a bootcamp already
     if (publisher && req.user.decoded.role !== "admin") {
       return next(new CustomError(`You can only publish one bootcamp`, 400));
     }
@@ -59,6 +63,16 @@ export const uploadPhoto = async (req, res, next) => {
         )
       );
     }
+
+    if (
+      bootcamp.user.toString() !== req.user.decoded.id &&
+      req.user.decoded.role !== "admin"
+    ) {
+      return next(
+        new CustomError(`You are not authorize to update this bootcamp`, 401)
+      );
+    }
+
     if (!req.files) {
       return next(new CustomError(`No photo uploaded`, 400));
     }
@@ -67,8 +81,6 @@ export const uploadPhoto = async (req, res, next) => {
 
     let max_size = 1000000;
     let upload_path = "./public/upload";
-
-    console.log(file);
 
     if (!file.mimetype.startsWith("image")) {
       return next(new CustomError(`Upload an image`, 400));
@@ -113,15 +125,26 @@ export const uploadPhoto = async (req, res, next) => {
 
 export const updateBootcamp = async (req, res, next) => {
   try {
-    const bootcamp = await BootCampSchema.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    let bootcamp = await BootCampSchema.findById(req.params.id);
 
     if (!bootcamp) {
-      new CustomError(`Bootcamp with this ${req.params.id} not found`, 404);
+      return next(
+        new CustomError(`Bootcamp with this ${req.params.id} not found`, 404)
+      );
     }
+
+    if (
+      bootcamp.user.toString() !== req.user.decoded.id &&
+      req.user.decoded.role !== "admin"
+    ) {
+      return next(
+        new CustomError(`You are not authorize to update this bootcamp`, 401)
+      );
+    }
+
+    bootcamp = await BootCampSchema.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
 
     res.send({ success: true, data: bootcamp });
   } catch (error) {
@@ -139,6 +162,14 @@ export const deleteBootcamp = async (req, res, next) => {
           `Bootcamp with this id: ${req.params.id} is not found`,
           404
         )
+      );
+    }
+    if (
+      bootcamp.user.toString() !== req.user.decoded.id &&
+      req.user.decoded.role !== "admin"
+    ) {
+      return next(
+        new CustomError(`You are not authorize to delete this bootcamp`, 401)
       );
     }
     bootcamp.remove();
