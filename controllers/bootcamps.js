@@ -1,5 +1,8 @@
 const BootCampSchema = require("../models/Bootcamps");
 import { CustomError } from "../utils/customError";
+import path from "path";
+import { populate, find } from "../models/Bootcamps";
+import { paginateApi } from "../middlewares/paginate";
 
 export const createBootcamp = async (req, res, next) => {
   try {
@@ -13,48 +16,9 @@ export const createBootcamp = async (req, res, next) => {
 };
 
 export const getAllBootcamps = async (req, res, next) => {
-  try {
-    let bootcamps;
+  const bootcamps = await paginateApi(BootCampSchema, req, next, "populate");
 
-    let page = Number(req.query.page) || 1;
-    let limit = Number(req.query.limit) || 10;
-    let startIndex = (page - 1) * limit;
-    let endIndex = page * limit;
-
-    let count = await BootCampSchema.countDocuments();
-
-    if (req.query.select) {
-      const query = req.query.select.split(",").join(" ");
-      bootcamps = await BootCampSchema.find()
-        .select(query)
-        .skip(startIndex)
-        .limit(limit);
-    } else {
-      bootcamps = await BootCampSchema.find()
-        .populate({
-          path: "courses",
-          select: "title weeks",
-        })
-        .skip(startIndex)
-        .limit(limit);
-    }
-
-    let pagination = {};
-
-    if (endIndex < count) {
-      pagination.next = page + 1;
-    }
-
-    if (startIndex >= limit) {
-      pagination.prev = page - 1;
-    }
-
-    pagination.count = count;
-    res.send({ success: true, pagination, data: bootcamps });
-  } catch (error) {
-    const err = { success: false, status: 404, error: error.message };
-    next(error);
-  }
+  res.send(bootcamps);
 };
 
 export const getOneBootcamp = async (req, res, next) => {
@@ -70,6 +34,69 @@ export const getOneBootcamp = async (req, res, next) => {
     }
 
     res.send({ success: true, data: bootcamps });
+  } catch (error) {
+    const err = { success: false, status: 404, error: error.message };
+    next(error);
+  }
+};
+
+export const uploadPhoto = async (req, res, next) => {
+  try {
+    const bootcamp = await BootCampSchema.findById(req.params.id);
+    if (!bootcamp) {
+      return next(
+        new CustomError(
+          `Bootcamp with this id: ${req.params.id} is not found`,
+          404
+        )
+      );
+    }
+    if (!req.files) {
+      return next(new CustomError(`No photo uploaded`, 400));
+    }
+
+    let file = req.files.file;
+
+    let max_size = 1000000;
+    let upload_path = "./public/upload";
+
+    console.log(file);
+
+    if (!file.mimetype.startsWith("image")) {
+      return next(new CustomError(`Upload an image`, 400));
+    }
+
+    if (file.size > max_size) {
+      return next(
+        new CustomError(
+          `Image size should not be greater than ${max_size / 1000000}mb`,
+          400
+        )
+      );
+    }
+
+    file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+
+    file.mv(`${upload_path}/${file.name}`, async (err) => {
+      if (err) {
+        console.log(err);
+        return next(
+          new CustomError(
+            `Image size should not be greater than ${max_size / 1000000}mb`,
+            400
+          )
+        );
+      }
+
+      const uploaded_file = await BootCampSchema.findByIdAndUpdate(
+        req.params.id,
+        {
+          photo: file.name,
+        }
+      );
+
+      res.send({ success: true, data: uploaded_file });
+    });
   } catch (error) {
     const err = { success: false, status: 404, error: error.message };
     next(error);

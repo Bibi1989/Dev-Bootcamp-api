@@ -1,6 +1,7 @@
 const Course = require("../models/Courses");
 const Bootcamp = require("../models/Bootcamps");
 import { CustomError } from "../utils/customError";
+import { paginateApi } from "../middlewares/paginate";
 
 export const createBootcampCourse = async (req, res, next) => {
   try {
@@ -28,23 +29,9 @@ export const createBootcampCourse = async (req, res, next) => {
 };
 
 export const getAllCourses = async (req, res, next) => {
-  try {
-    let courses;
-    console.log(req.params.bootcampId);
-    if (req.params.bootcampId) {
-      courses = await Course.find({ bootcamp: req.params.bootcampId });
-    } else {
-      courses = await Course.find().populate({
-        path: "bootcamp",
-        select: "name description",
-      });
-    }
+  const courses = await paginateApi(Course, req, next);
 
-    res.send({ success: true, count: courses.length, data: courses });
-  } catch (error) {
-    const err = { success: false, status: 404, error: error.message };
-    next(error);
-  }
+  res.send(courses);
 };
 
 export const getOneCourse = async (req, res, next) => {
@@ -78,9 +65,11 @@ export const updateCourse = async (req, res, next) => {
     );
 
     if (!course) {
-      new CustomError(
-        `Course with this ${req.params.bootcampId} not found`,
-        404
+      return next(
+        new CustomError(
+          `Course with this ${req.params.bootcampId} not found`,
+          404
+        )
       );
     }
 

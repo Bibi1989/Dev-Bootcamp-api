@@ -74,6 +74,7 @@ const BootCampSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
+      default: "avatar.jpg",
     },
     housing: {
       type: Boolean,
@@ -106,7 +107,7 @@ BootCampSchema.pre("save", async function (next) {
   const location = {
     type: "Point",
     coordinates: [loc[0].longitude, loc[0].latitude],
-    formatedAddress: loc[0].formatedAddress,
+    formattedAddress: loc[0].formattedAddress,
     street: loc[0].streetName,
     city: loc[0].city,
     state: loc[0].stateCode,

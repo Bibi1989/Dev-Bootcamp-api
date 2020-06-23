@@ -5,13 +5,14 @@ import {
   getOneBootcamp,
   deleteBootcamp,
   updateBootcamp,
+  uploadPhoto,
 } from "../controllers/bootcamps";
 const router = Router();
 
 // @desc      Get all bootcamps
 // @route     GET /api/v1/bootcamps
 // @access    Public
-router.route("/").get(getAllBootcamps);
+router.route("/").get(getAllBootcamps).post(createBootcamp);
 
 // @desc      Get all bootcamps
 // @route     GET /api/v1/bootcamps
@@ -25,6 +26,6 @@ router
 // @desc      Post  bootcamp
 // @route     Post /api/v1/bootcamps
 // @access    Public
-router.route("/").post(createBootcamp);
+router.route("/:id/photo").patch(uploadPhoto);
 
 export default router;
